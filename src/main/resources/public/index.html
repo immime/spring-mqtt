@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Send me a message</title>
+    <script src="http://code.jquery.com/jquery-2.2.0.min.js"></script>
+</head>
+<body>
+    <input id="message" type="text" name="message" placeholder="Text here"/>
+    <button id="sendBtn">Send me a message</button>
+</body>
+<script>
+    if ('WebSocket' in window){
+        console.log('Websocket supported');
+        socket = new WebSocket('ws://localhost:8080/socket/topic');
+
+        console.log('Connection attempted');
+
+        socket.onopen = function(){
+            console.log('Connection open!');
+        };
+
+        socket.onclose = function(){
+            console.log('Disconnecting connection');
+        };
+
+        socket.onmessage = function (evt)
+        {
+            var received_msg = evt.data;
+            console.log(received_msg);
+        };
+
+        socket.onerror = function (evt) {
+            console.log(evt);
+        }
+
+    } else {
+        console.log('Websocket not supported');
+    }
+
+
+    $("#sendBtn").click(function() {
+        var message = document.getElementById("message").value;
+        $.ajax({
+            type: "POST",
+            url: "/send",
+            data: {message: message}
+        });
+        socket.send(message);
+    })
+</script>
+</html>
